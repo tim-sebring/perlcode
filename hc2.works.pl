@@ -53,8 +53,7 @@ use strict;
 
 
 ##################### Variables/Constants #######################################
-my $EMAIL = "NSC-SOLARIS-RUN-team.email\@nationwide.com,corderj2\@nationwide.com";	# Who gets notified
-#my $EMAIL = "sebrint\@nationwide.com";
+my $EMAIL = "root@localhost";	# Who gets notified
 
 my $server_list="/vol/adm/sadocs/serverlist";	# List of servers to check
 #my $server_list="/vol/adm/sadocs/serverlist2";
