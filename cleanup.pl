@@ -25,7 +25,7 @@ $ENV{'TWO_TASK'}="toold";
 $ENV{'ORACLE_HOME'}="/vol/oracle10.2.0.4";
 $ENV{'TNS_ADMIN'}="/vol/rdbms/oracle/net";
 my $user="healthck";
-my $pass="sebring12";
+my $pass="xxxxxxxx";
 my $tblspace="toold";
 my @row;
 my $sth;
