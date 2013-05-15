@@ -22,8 +22,7 @@ if ($ENV{'REQUEST_METHOD'} eq 'POST') {
 
 open (MESSAGE,"| /usr/sbin/sendmail -t");
 
-	print MESSAGE "To: grovecitykarate\@gmail.com\n"; # Don't forget to escape this @ symbol!
-#	print MESSAGE "To: tim.sebring\@gmail.com\n"; # Don't forget to escape this @ symbol!
+	print MESSAGE "To: a.real.address\@gmail.com\n"; # Don't forget to escape this @ symbol!
 	print MESSAGE "From: " . $FORM{name} . "\n";
 	print MESSAGE "Reply-to: " . $FORM{email} . "(" . $FORM{name} . ")\n";
 	
@@ -59,7 +58,7 @@ print <<EndStart;
 	
 	<p>Your feedback has been received. Thanks for sending it.</p>
 
-	<p><a href="/">Return to GCK Home.</a></p>	
+	<p><a href="/">Return to Home.</a></p>	
 	<hr>
 	
 EndStart
