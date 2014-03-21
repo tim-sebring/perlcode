@@ -15,8 +15,8 @@
 ###############################################################################
 #                   Changelog  - please document changes here                 #
 #        (and remember to make a backup copy first!)                          #
-# 2010-10-27 - sebrint - script created                                       #
-# 2012-01-30 - sebrint - adding cron scheduling system                        #
+# 2010-10-27 - myuserid - script created                                       #
+# 2012-01-30 - myuserid - adding cron scheduling system                        #
 ###############################################################################
 
 use lib '/vol/perl/5.8/DBD/oracle10.2.0.4/lib/site_perl/5.8.1/sun4-solaris';
@@ -27,9 +27,9 @@ use strict;
 $ENV{'TWO_TASK'}="tooldevl";
 $ENV{'ORACLE_HOME'}="/vol/oracle10.2.0.4";
 $ENV{'TNS_ADMIN'}="/vol/rdbms/oracle/net";
-my $user="healthck";
-my $pass="xxxxxxxx";
-my $tblspace="tooldevl";
+my $user="username";
+my $pass="password";
+my $tblspace="tblspace";
 my @row;
 my $sth;
 my $dbh;

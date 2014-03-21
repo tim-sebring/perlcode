@@ -6,41 +6,41 @@ use Data::Dumper;
 use POSIX qw/strftime/;
 use strict;
 #################################################################################
-#                             Healthcheck.pl                                    #
+#                             hc2.works.pl                                      #
 # This script connects to each server in the server list, and executes various  #
 # checks against the connection, keeping track of servers that cannot be        #
 # connected to, and the results of any offenders, then sends the final report   #
 # to the email group listed in $EMAIL.                                          #
 #################################################################################
 # NOTE: This script is edited on another system then deployed to oz 
-#    automatically. If a change is needed, see Tim, don't change directly on oz
+#    automatically. 
 #################################################################################
 #                            Changelog                                         
-# 07-14-2009  sebrint - Created script/started changelog                        
-# 07-21-2009  sebrint - Added dumpadm and mirrors sections
-# 07-31-2009  sebrint - Added check for servers asking for password
-# 08-04-2009  sebrint - Converted main loop to array
-# 08-05-2009  sebrint - Added parallel processing, multiple connections at once
-# 08-06-2009  sebrint - Converted to use OpenSSH for connecttimeout option (backed out -- not needed)
-# 08-26-2009  sebrint - Updated timeouts, updated check for zfs/ufs (elsif)
-# 08-28-2009  sebrint - Added DMP check, removed extraneous lines for mirror check
-# 09-01-2009  sebrint - Added fmadm faulty check 
-# 09-02-2009  sebrint - Added frozen resources check for VCS
-# 09-03-2009  sebrint - Added check for VCS - autodisabled resources
-# 09-30-2009  sebrint - Added psrinfo check
-# 10-01-2009  sebrint - Added SVM Maintenance check
-# 10-29-2009  sebrint - Added logging in /var/adm/hc.log
-# 05-17-2010  sebrint - Added check for vxsvc process (could be temporary)
-# 07-20-2010  sebrint - Added check for faulted VCS resources
-# 01-24-2011  sebrint - Updated wiki URL, fixed 'err' grep causing montserrat* to show up always
-# 04-12-2011  sebrint - Added fcinfo check for offline HBAs
-# 04-20-2011  sebrint - finished check from last July to check for faulted VCS resources (was not completed)
-# 01-13-2012  sebrint - Moved script to belle-ld02 from sedcjt825 (mercury environment being removed)
-# 03-12-2012  sebrint - Removed vxsvc report from email, based on eleuthera04 issue
-# 05-31-2012  sebrint - Added VCS "monitor procedure did not complete" check
-# 06-22-2012  sebrint - Re-added the vxsvc report so that we can turn them off for older frames, etc
-# 07-12-2012  sebrint - Changed HBA offline check to a powermt display check
-# 11-27-2012  sebrint - Updated script to use healthck ID instead of sebrint (non exp password)
+# 07-14-2009  myuserid - Created script/started changelog                        
+# 07-21-2009  myuserid - Added dumpadm and mirrors sections
+# 07-31-2009  myuserid - Added check for servers asking for password
+# 08-04-2009  myuserid - Converted main loop to array
+# 08-05-2009  myuserid - Added parallel processing, multiple connections at once
+# 08-06-2009  myuserid - Converted to use OpenSSH for connecttimeout option (backed out -- not needed)
+# 08-26-2009  myuserid - Updated timeouts, updated check for zfs/ufs (elsif)
+# 08-28-2009  myuserid - Added DMP check, removed extraneous lines for mirror check
+# 09-01-2009  myuserid - Added fmadm faulty check 
+# 09-02-2009  myuserid - Added frozen resources check for VCS
+# 09-03-2009  myuserid - Added check for VCS - autodisabled resources
+# 09-30-2009  myuserid - Added psrinfo check
+# 10-01-2009  myuserid - Added SVM Maintenance check
+# 10-29-2009  myuserid - Added logging in /var/adm/hc.log
+# 05-17-2010  myuserid - Added check for vxsvc process (could be temporary)
+# 07-20-2010  myuserid - Added check for faulted VCS resources
+# 01-24-2011  myuserid - Updated wiki URL, fixed 'err' grep causing montserrat* to show up always
+# 04-12-2011  myuserid - Added fcinfo check for offline HBAs
+# 04-20-2011  myuserid - finished check from last July to check for faulted VCS resources (was not completed)
+# 01-13-2012  myuserid - Moved script to belle-ld02 from sedcjt825 (mercury environment being removed)
+# 03-12-2012  myuserid - Removed vxsvc report from email, based on eleuthera04 issue
+# 05-31-2012  myuserid - Added VCS "monitor procedure did not complete" check
+# 06-22-2012  myuserid - Re-added the vxsvc report so that we can turn them off for older frames, etc
+# 07-12-2012  myuserid - Changed HBA offline check to a powermt display check
+# 11-27-2012  myuserid - Updated script to use healthck ID instead of myuserid (non exp password)
 #                                                                               
 #################################################################################
 
@@ -56,14 +56,11 @@ use strict;
 my $EMAIL = "root@localhost";	# Who gets notified
 
 my $server_list="/vol/adm/sadocs/serverlist";	# List of servers to check
-#my $server_list="/vol/adm/sadocs/serverlist2";
-#my $server_list="/vol/adm/sadocs/serverlist3";
 
 
 my $time_start;					# Used to capture processing time
 my $time_end;					# Used to capture processing time
-#my $user="sebrint";				# Used in ssh connection
-my $user="healthck";				# Used in ssh connection
+my $user="username";				# Used in ssh connection
 my $progress;					# Used in displaying progress indicator bar
 my $total_server_count = 0;			# How many servers are in $server_list
 my $connected_server_count = 0;			# How many of those servers we can connect to
@@ -83,7 +80,7 @@ my $HC = "/tmp/healthcheck.hc";			# File used to mail complete list to users
 my $SVMMAINTFILE = "/tmp/svmmaint.hc";		# List of servers with plexes in maintenance/error state
 my $PSRINFOFILE = "/tmp/psrinfo.hc";            # List of servers with CPUs that are not on-line
 my $SYSLOG = "/var/adm/hc.log";			# System log of hc script
-my $METADBFILE = "/tmp/metadb.hc";			# Count the number of metadbs, should be 6 total
+my $METADBFILE = "/tmp/metadb.hc";		# Count the number of metadbs, should be 6 total
 my $VXSVCFILE = "/tmp/vxsvc.hc";		# List of servers with vxsvc running
 my $VCSFAULTFILE = "/tmp/vcsfault.hc";		# List of servers with faulted resources in VCS
 my $FCINFOFILE = "/tmp/fcinfo.hc";		# List of servers with a non-online fcinfo State
@@ -95,9 +92,7 @@ my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
 $year = $year + 1900;  			# Number of years since 1900, so we need to add 1900
 $mon = $mon + 1;			# Jan is 0, Dec is 11, so we need to add one to get month
 if($mon < 10) { $mon = "0" . $mon; }	# Have to turn "5" into "05" to compare date strings
-#print("My year is $year\n");
 my $sysdate = "$year/$mon/$mday";
-#print("my sysdate is $sysdate\n");
 
 ######################################### Command list ##############################################
 
