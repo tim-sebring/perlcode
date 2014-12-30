@@ -18,7 +18,7 @@ ReadMode(0);
 print("\n");
 chomp($passwd);
 #my $ldap = Net::LDAP->new($hostname) or die "Unable to connect to $hostname: $@|n";
-my $ldap = Net::LDAP->new($hostname, 
+my $ldap = Net::LDAPS->new($hostname, 
                        port => '636',
                        scheme => 'ldaps',
                        cafile => '/var/ldap/UNIXCERT.pem',
