@@ -5,6 +5,14 @@ Scripts that I've written throughout the years to support various systems...
 Mostly on Solaris at this point.
 
 
+<h3>ldap.pl</h3>
+
+<p>For anyone who has attempted to piece together a syntactically correct
+ldapsearch command in the past, I created this script to allow me to search
+much easier -- like 'uid=sebrint' or whatever. The script gives you examples
+when you go to run it.</p>
+
+
 <h3>cleanup.pl</h3>
 
 <p>This script was used to clean out data after a certain time period. It simply would delete data from
