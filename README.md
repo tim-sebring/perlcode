@@ -82,3 +82,9 @@ elsewhere.</p>
 the event of an incident, what was broken and how it was fixed. Over the years this built up a very comprehensive
 knowledge base of solutions. The original version of slog was a Vim template, but some team members desired a
 web interface, and thus this script was born.</p>
+
+<h3>graph.pl</h3>
+
+<p>My first attempt in generating a graph with arbitrary data. One generated a line graph, one generated a bar graph.
+both output files are included, but the script only differs with GD::Graph::lines vs GD::Graph::bars.</p>
+
